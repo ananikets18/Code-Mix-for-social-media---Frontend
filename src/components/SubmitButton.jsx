@@ -1,11 +1,27 @@
-import React from 'react';
+import React, { useRef } from 'react';
 
 const SubmitButton = ({ loading, activeTab, text, handleSubmit }) => {
+  const buttonRef = useRef(null);
+  const lastClickTime = useRef(0);
+  const RATE_LIMIT_MS = 500; // Prevent rapid clicks within 500ms
+
+  // Debounced click handler to prevent rapid-fire submissions
+  const handleClick = (e) => {
+    const now = Date.now();
+    if (now - lastClickTime.current < RATE_LIMIT_MS) {
+      e.preventDefault();
+      return;
+    }
+    lastClickTime.current = now;
+    handleSubmit(e);
+  };
+
   return (
     <button
-      onClick={handleSubmit}
+      ref={buttonRef}
+      onClick={handleClick}
       disabled={loading || !text.trim()}
-      className="w-full font-medium py-3 px-6 rounded-lg transition-colors flex items-center justify-center space-x-2 bg-blue-600 hover:bg-blue-700 disabled:bg-gray-400 text-white"
+      className="w-full font-medium py-3 px-6 rounded-lg transition-all flex items-center justify-center space-x-2 bg-gradient-primary hover:opacity-90 disabled:opacity-50 disabled:cursor-not-allowed text-white shadow-lg"
     >
       {loading ? (
         <>

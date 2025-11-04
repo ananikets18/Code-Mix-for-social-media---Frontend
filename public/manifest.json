@@ -1,6 +1,7 @@
 {
-  "short_name": "React App",
-  "name": "Create React App Sample",
+  "short_name": "CM Analyzer",
+  "name": "Code-Mixed Social Media Analyzer",
+  "description": "Advanced NLP tool for analyzing code-mixed social media text with sentiment, toxicity, and translation capabilities",
   "icons": [
     {
       "src": "favicon.ico",
@@ -10,16 +11,21 @@
     {
       "src": "logo192.png",
       "type": "image/png",
-      "sizes": "192x192"
+      "sizes": "192x192",
+      "purpose": "any maskable"
     },
     {
       "src": "logo512.png",
       "type": "image/png",
-      "sizes": "512x512"
+      "sizes": "512x512",
+      "purpose": "any maskable"
     }
   ],
   "start_url": ".",
   "display": "standalone",
-  "theme_color": "#000000",
-  "background_color": "#ffffff"
+  "theme_color": "#3b82f6",
+  "background_color": "#1e293b",
+  "orientation": "portrait-primary",
+  "scope": "/",
+  "categories": ["education", "utilities", "productivity"]
 }

@@ -2,23 +2,23 @@ import React from 'react';
 
 const TabNavigation = ({ activeTab, setActiveTab }) => {
   return (
-    <div className="flex space-x-2 mb-6 border-gray-200 border-b">
+    <div className="flex space-x-2 border-b border-gray-200 dark:border-gray-700">
       <button
         onClick={() => setActiveTab('analyze')}
-        className={`px-4 py-2 font-medium text-sm transition-colors ${
+        className={`px-4 py-2 font-medium text-sm transition-all ${
           activeTab === 'analyze'
-            ? 'text-blue-600 border-b-2 border-blue-600'
-            : 'text-gray-600 hover:text-gray-900'
+            ? 'text-primary-600 dark:text-primary-400 border-b-2 border-primary-600 dark:border-primary-500'
+            : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200'
         }`}
       >
         📊 Analyze
       </button>
       <button
         onClick={() => setActiveTab('translate')}
-        className={`px-4 py-2 font-medium text-sm transition-colors ${
+        className={`px-4 py-2 font-medium text-sm transition-all ${
           activeTab === 'translate'
-            ? 'text-blue-600 border-b-2 border-blue-600'
-            : 'text-gray-600 hover:text-gray-900'
+            ? 'text-accent-600 dark:text-accent-400 border-b-2 border-accent-600 dark:border-accent-500'
+            : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200'
         }`}
       >
         🌍 Translate

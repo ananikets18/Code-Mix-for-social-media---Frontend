@@ -1,4 +1,4 @@
-# Multilingual NLP Analyzer - Frontend
+# Multilingual Code-Mix NLP Analyzer - [Frontend]
 
 A modern React + TailwindCSS frontend for testing the Multilingual NLP Analysis API.
 

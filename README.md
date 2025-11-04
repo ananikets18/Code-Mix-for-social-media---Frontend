@@ -1,4 +1,3 @@
-```markdown
 # Multilingual NLP Analyzer - Frontend
 
 A modern React + TailwindCSS frontend for testing the Multilingual NLP Analysis API.
@@ -99,4 +98,3 @@ Bundles React in production mode and optimizes the build for best performance.
 
 The build is minified, and filenames include hashes.  
 Your app is ready to be deployed!
-```

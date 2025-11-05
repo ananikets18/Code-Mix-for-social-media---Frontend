@@ -8,7 +8,6 @@ const STORAGE_KEYS = {
   RECENT_ANALYSES: 'cm-analyzer-recent-analyses',
   CACHE: 'cm-analyzer-cache',
   USER_PREFERENCES: 'cm-analyzer-preferences',
-  BANNER_DISMISSED: 'infoBannerDismissed' // Keep existing key for compatibility
 };
 
 const MAX_RECENT_ANALYSES = 10;

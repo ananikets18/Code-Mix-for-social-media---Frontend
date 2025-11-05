@@ -441,8 +441,7 @@ function HomePage() {
 
   return (
     <div className="min-h-screen bg-gradient-light dark:bg-gradient-dark text-gray-900 dark:text-white transition-colors duration-300">
-      {/* Info Banner */}
-      <InfoBanner />
+
       
       {/* Network Status Notification */}
       <NetworkStatus />
@@ -732,6 +731,8 @@ function HomePage() {
       </main>
 
       <Footer />
+      {/* Info Banner */}
+      <InfoBanner />
     </div>
   );
 }

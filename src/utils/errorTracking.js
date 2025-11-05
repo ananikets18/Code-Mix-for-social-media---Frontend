@@ -75,13 +75,16 @@ export const initializeErrorTracking = () => {
  * Capture an exception
  */
 export const captureException = (error, context = {}) => {
-  logger.error('Error captured:', error, context);
+  // Only log to console in development
+  if (process.env.NODE_ENV === 'development') {
+    logger.error('Error captured:', error, context);
+  }
   
   if (isInitialized && errorTracker) {
     // errorTracker.captureException(error, { extra: context });
   }
   
-  // Fallback: log to console in development
+  // Detailed error logging only in development
   if (process.env.NODE_ENV === 'development') {
     logger.group('🔴 Error Details');
     logger.error('Error:', error);
@@ -118,7 +121,10 @@ export const addBreadcrumb = (breadcrumb) => {
     // errorTracker.addBreadcrumb(breadcrumb);
   }
   
-  logger.log('📌 Breadcrumb:', breadcrumb);
+  // Only log breadcrumbs in development
+  if (process.env.NODE_ENV === 'development') {
+    logger.log('📌 Breadcrumb:', breadcrumb);
+  }
 };
 
 /**

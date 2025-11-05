@@ -50,7 +50,8 @@ export const trackPageView = (pagePath, pageTitle) => {
 export const trackEvent = (eventName, eventParams = {}) => {
   if (typeof window.gtag === 'function') {
     window.gtag('event', eventName, eventParams);
-  } else {
+  } else if (process.env.NODE_ENV === 'development') {
+    // Only log in development when gtag is not available
     logger.log(`Analytics Event: ${eventName}`, eventParams);
   }
 };

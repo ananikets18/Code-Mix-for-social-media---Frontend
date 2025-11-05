@@ -13,12 +13,6 @@ const TranslateOptions = ({ sourceLang, setSourceLang, targetLang, setTargetLang
           className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-accent-500 focus:border-accent-500 bg-gray-50 dark:bg-gray-900/50 border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white transition-all"
         >
           <option value="auto">Auto-detect</option>
-          <option value="en">English</option>
-          <option value="hi">Hindi</option>
-          <option value="mr">Marathi</option>
-          <option value="bn">Bengali</option>
-          <option value="ta">Tamil</option>
-          <option value="te">Telugu</option>
         </select>
       </div>
       <div>

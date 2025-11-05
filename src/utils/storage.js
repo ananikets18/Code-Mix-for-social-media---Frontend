@@ -1,7 +1,3 @@
-/**
- * LocalStorage Utility for Data Persistence
- * Handles user preferences, caching, and data management
- */
 
 import logger from './logger';
 
@@ -16,7 +12,7 @@ const STORAGE_KEYS = {
 };
 
 const MAX_RECENT_ANALYSES = 10;
-const CACHE_TTL = 5 * 60 * 1000; // 5 minutes in milliseconds
+const CACHE_TTL = 10 * 1000; // 10 seconds in milliseconds
 
 /**
  * Safe localStorage wrapper with error handling
@@ -280,13 +276,4 @@ export const getStorageInfo = () => {
   };
 };
 
-export default {
-  ThemeStorage,
-  CompactModeStorage,
-  LanguageStorage,
-  RecentAnalysesStorage,
-  CacheStorage,
-  UserPreferences,
-  clearAllData,
-  getStorageInfo
-};
+

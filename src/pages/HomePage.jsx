@@ -11,7 +11,7 @@ import NetworkStatus from '../components/NetworkStatus';
 import LoadingOverlay from '../components/LoadingOverlay';
 import InfoBanner from '../components/InfoBanner';
 import { sanitizeTextInput } from '../utils/sanitize';
-import Analytics from '../utils/analytics';
+import Analytics, { trackEvent } from '../utils/analytics';
 import { ErrorTracking } from '../utils/errorTracking';
 import logger from '../utils/logger';
 import { 
@@ -38,6 +38,9 @@ function HomePage() {
   const [targetLang, setTargetLang] = useState('hi');
   const [sourceLang, setSourceLang] = useState('auto');
   const [loadingMessage, setLoadingMessage] = useState('Processing...');
+  
+  // Ref to store cancel token for request cancellation
+  const cancelTokenSourceRef = React.useRef(null);
 
   // Load preferences from storage on mount
   useEffect(() => {
@@ -50,6 +53,13 @@ function HomePage() {
 
     // Clean expired cache on mount
     CacheStorage.cleanExpired();
+    
+    // Cleanup function to cancel any pending requests on unmount
+    return () => {
+      if (cancelTokenSourceRef.current) {
+        cancelTokenSourceRef.current.cancel('Component unmounted');
+      }
+    };
   }, []);
 
   // Save preferences when they change
@@ -72,6 +82,15 @@ function HomePage() {
   // API Functions
   const analyzeText = async () => {
     const startTime = Date.now();
+    
+    // Cancel any pending requests
+    if (cancelTokenSourceRef.current) {
+      cancelTokenSourceRef.current.cancel('New request initiated');
+    }
+    
+    // Create new cancel token
+    cancelTokenSourceRef.current = axios.CancelToken.source();
+    
     setLoading(true);
     setLoadingMessage('Analyzing text...');
     setError('');
@@ -96,11 +115,24 @@ function HomePage() {
       const cachedResult = CacheStorage.get(cacheKey);
       
       if (cachedResult) {
+        if (process.env.NODE_ENV === 'development') {
+          console.log('Using cached result for analyze');
+        }
         setResult(cachedResult);
-        Analytics.trackEvent('cache_hit', { endpoint: '/analyze' });
+        trackEvent('cache_hit', { endpoint: '/analyze' });
+        setLoading(false);
         return;
       }
       
+      if (process.env.NODE_ENV === 'development') {
+        console.log('Making fresh API call to /analyze', { 
+          url: `${API_BASE_URL}/analyze`,
+          textLength: sanitizedText.length,
+          compactMode 
+        });
+      }
+      
+      // Create a fresh axios request with cancel token
       const response = await axios.post(`${API_BASE_URL}/analyze`, {
         text: sanitizedText,
         compact_mode: compactMode
@@ -108,8 +140,19 @@ function HomePage() {
         timeout: 30000, // 30 second timeout
         headers: {
           'Content-Type': 'application/json',
+        },
+        cancelToken: cancelTokenSourceRef.current.token,
+        // Force axios to not reuse connections that might be stale
+        transformRequest: [(data) => JSON.stringify(data)],
+        validateStatus: function (status) {
+          return status >= 200 && status < 500; // Resolve for any status less than 500
         }
       });
+
+      // Check if we got an error status but axios didn't reject
+      if (response.status >= 400) {
+        throw new Error(response.data?.detail || `HTTP ${response.status} error`);
+      }
 
       // Validate response structure
       if (!response.data) {
@@ -138,6 +181,25 @@ function HomePage() {
       let errorMessage = 'An error occurred during analysis';
       let errorType = 'UNKNOWN_ERROR';
 
+      // Check if request was cancelled
+      if (axios.isCancel(err)) {
+        if (process.env.NODE_ENV === 'development') {
+          console.log('Request cancelled:', err.message);
+        }
+        return; // Don't show error for cancelled requests
+      }
+
+      // Log the full error for debugging
+      console.error('Analysis error:', err);
+      if (process.env.NODE_ENV === 'development') {
+        console.error('Error details:', {
+          code: err.code,
+          message: err.message,
+          response: err.response,
+          request: err.request
+        });
+      }
+
       if (err.code === 'ECONNABORTED') {
         errorMessage = 'Request timeout. Please try again';
         errorType = 'TIMEOUT';
@@ -150,6 +212,9 @@ function HomePage() {
       } else if (!err.response) {
         errorMessage = 'Network error. Please check your connection and ensure the API server is running';
         errorType = 'NETWORK_ERROR';
+        if (process.env.NODE_ENV === 'development') {
+          console.error('Network error details - no response received. API URL:', API_BASE_URL);
+        }
       } else {
         errorMessage = err.response?.data?.detail || err.message || errorMessage;
         errorType = `HTTP_${err.response?.status || 'UNKNOWN'}`;
@@ -162,11 +227,21 @@ function HomePage() {
       ErrorTracking.apiError('/analyze', err, err.response?.status);
     } finally {
       setLoading(false);
+      cancelTokenSourceRef.current = null;
     }
   };
 
   const translateText = async () => {
     const startTime = Date.now();
+    
+    // Cancel any pending requests
+    if (cancelTokenSourceRef.current) {
+      cancelTokenSourceRef.current.cancel('New request initiated');
+    }
+    
+    // Create new cancel token
+    cancelTokenSourceRef.current = axios.CancelToken.source();
+    
     setLoading(true);
     setLoadingMessage('Translating text...');
     setError('');
@@ -193,11 +268,25 @@ function HomePage() {
       const cachedResult = CacheStorage.get(cacheKey);
       
       if (cachedResult) {
+        if (process.env.NODE_ENV === 'development') {
+          console.log('Using cached result for translate');
+        }
         setResult(cachedResult);
-        Analytics.trackEvent('cache_hit', { endpoint: '/translate' });
+        trackEvent('cache_hit', { endpoint: '/translate' });
+        setLoading(false);
         return;
       }
       
+      if (process.env.NODE_ENV === 'development') {
+        console.log('Making fresh API call to /translate', { 
+          url: `${API_BASE_URL}/translate`,
+          textLength: sanitizedText.length,
+          sourceLang,
+          targetLang 
+        });
+      }
+      
+      // Create a fresh axios request with cancel token
       const response = await axios.post(`${API_BASE_URL}/translate`, {
         text: sanitizedText,
         source_lang: sourceLang,
@@ -206,8 +295,19 @@ function HomePage() {
         timeout: 30000, // 30 second timeout
         headers: {
           'Content-Type': 'application/json',
+        },
+        cancelToken: cancelTokenSourceRef.current.token,
+        // Force axios to not reuse connections that might be stale
+        transformRequest: [(data) => JSON.stringify(data)],
+        validateStatus: function (status) {
+          return status >= 200 && status < 500; // Resolve for any status less than 500
         }
       });
+
+      // Check if we got an error status but axios didn't reject
+      if (response.status >= 400) {
+        throw new Error(response.data?.detail || `HTTP ${response.status} error`);
+      }
 
       // Validate response
       if (!response.data) {
@@ -231,6 +331,25 @@ function HomePage() {
       let errorMessage = 'An error occurred during translation';
       let errorType = 'UNKNOWN_ERROR';
 
+      // Check if request was cancelled
+      if (axios.isCancel(err)) {
+        if (process.env.NODE_ENV === 'development') {
+          console.log('Request cancelled:', err.message);
+        }
+        return; // Don't show error for cancelled requests
+      }
+
+      // Log the full error for debugging
+      console.error('Translation error:', err);
+      if (process.env.NODE_ENV === 'development') {
+        console.error('Error details:', {
+          code: err.code,
+          message: err.message,
+          response: err.response,
+          request: err.request
+        });
+      }
+
       if (err.code === 'ECONNABORTED') {
         errorMessage = 'Request timeout. Please try again';
         errorType = 'TIMEOUT';
@@ -243,6 +362,9 @@ function HomePage() {
       } else if (!err.response) {
         errorMessage = 'Network error. Please check your connection and ensure the API server is running';
         errorType = 'NETWORK_ERROR';
+        if (process.env.NODE_ENV === 'development') {
+          console.error('Network error details - no response received. API URL:', API_BASE_URL);
+        }
       } else {
         errorMessage = err.response?.data?.detail || err.message || errorMessage;
         errorType = `HTTP_${err.response?.status || 'UNKNOWN'}`;
@@ -255,12 +377,14 @@ function HomePage() {
       ErrorTracking.apiError('/translate', err, err.response?.status);
     } finally {
       setLoading(false);
+      cancelTokenSourceRef.current = null;
     }
   };
 
   const handleSubmit = () => {
-    // Clear previous errors
+    // Clear previous errors and results to ensure clean state
     setError('');
+    setResult(null);
 
     // Check internet connection
     if (!navigator.onLine) {
@@ -302,6 +426,9 @@ function HomePage() {
   // Handle tab switch with analytics
   const handleTabSwitch = (tab) => {
     setActiveTab(tab);
+    // Clear results and errors when switching tabs to prevent stale state
+    setResult(null);
+    setError('');
     Analytics.switchTab(tab);
     ErrorTracking.userAction('tab_switch', { tab });
   };

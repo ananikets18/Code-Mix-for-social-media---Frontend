@@ -3,6 +3,7 @@
  * Protects against XSS and injection attacks
  */
 
+
 /**
  * Sanitize text input by removing potentially harmful characters
  * @param {string} input - Raw user input
@@ -15,12 +16,14 @@ export const sanitizeTextInput = (input) => {
     // Remove null bytes
     .replace(/\0/g, '')
     // Remove control characters (except newlines and tabs)
+    // eslint-disable-next-line no-control-regex
     .replace(/[\x00-\x08\x0B-\x0C\x0E-\x1F\x7F]/g, '')
     // Limit consecutive whitespace
     .replace(/\s{10,}/g, ' '.repeat(10))
     // Trim to reasonable length (prevent DOS)
     .slice(0, 10000);
 };
+
 
 /**
  * Escape HTML special characters to prevent XSS
@@ -42,6 +45,7 @@ export const escapeHtml = (text) => {
   return text.replace(/[&<>"'/]/g, (char) => map[char]);
 };
 
+
 /**
  * Validate and sanitize URL
  * @param {string} url - URL to validate
@@ -62,6 +66,7 @@ export const sanitizeUrl = (url) => {
   }
 };
 
+
 /**
  * Remove potentially dangerous characters from filenames
  * @param {string} filename - Original filename
@@ -76,6 +81,7 @@ export const sanitizeFilename = (filename) => {
     .slice(0, 255);
 };
 
+
 /**
  * Validate email format
  * @param {string} email - Email to validate
@@ -87,6 +93,7 @@ export const isValidEmail = (email) => {
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
   return emailRegex.test(email) && email.length <= 254;
 };
+
 
 /**
  * Sanitize JSON for safe display
@@ -115,6 +122,7 @@ export const sanitizeJsonForDisplay = (obj) => {
   return sanitized;
 };
 
+
 /**
  * Rate limiting helper - client side
  * @param {Function} func - Function to throttle
@@ -133,6 +141,7 @@ export const throttle = (func, delay) => {
   };
 };
 
+
 /**
  * Debounce helper
  * @param {Function} func - Function to debounce
@@ -147,7 +156,8 @@ export const debounce = (func, delay) => {
   };
 };
 
-export default {
+
+const sanitizeUtils = {
   sanitizeTextInput,
   escapeHtml,
   sanitizeUrl,
@@ -157,3 +167,5 @@ export default {
   throttle,
   debounce,
 };
+
+export default sanitizeUtils;

@@ -2,6 +2,14 @@
   publish = "build"
   command = "npm run build"
 
+# API Proxy to bypass CORS issues
+[[redirects]]
+  from = "/api/*"
+  to = "https://thequoteshub.info/:splat"
+  status = 200
+  force = true
+  headers = {X-From = "Netlify"}
+
 [[redirects]]
   from = "/*"
   to = "/index.html"

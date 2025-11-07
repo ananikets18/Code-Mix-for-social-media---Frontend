@@ -3,7 +3,7 @@ import AzureLogo from "../Azure.svg";
 
 const Footer = () => {
   return (
-    <footer className="mt-12 pb-10 border-t-2 border-t-gray-300 pt-10">
+    <footer className="mt-12 pb-10 border-t-2 border-t-gray-300 dark:border-t-gray-700 pt-10">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex flex-col items-center text-center text-gray-500 dark:text-gray-400 space-y-3">
           {/* Azure Logo section */}

@@ -5,7 +5,6 @@ import ToxicityRadar from './visualizations/ToxicityRadar';
 import LanguageComposition from './visualizations/LanguageComposition';
 import ConfidenceMeter from './visualizations/ConfidenceMeter';
 import TextStats from './visualizations/TextStats';
-import CopyButton from './visualizations/CopyButton';
 
 const AnalyzeResults = ({ result, compactMode }) => {
   const [expandedSections, setExpandedSections] = useState({
@@ -297,17 +296,6 @@ const AnalyzeResults = ({ result, compactMode }) => {
               </div>
             )}
           </div>
-        )}
-      </div>
-
-      {/* Action Buttons */}
-      <div className="flex flex-wrap gap-3 pt-2">
-        <CopyButton text={result.original_text} label="Original Text" />
-        {result.translations?.english && (
-          <CopyButton text={result.translations.english} label="Translation" />
-        )}
-        {result.statistics?.preprocessing_preview?.cleaned && (
-          <CopyButton text={result.statistics.preprocessing_preview.cleaned} label="Cleaned Text" />
         )}
       </div>
 
